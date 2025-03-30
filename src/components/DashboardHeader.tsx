@@ -1,11 +1,21 @@
 
 import React from 'react';
-import { Bell, User, Settings } from 'lucide-react';
+import { Bell, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/contexts/AuthContext';
 
 const DashboardHeader = () => {
+  const { user, profile, signOut, isAdmin } = useAuth();
+  
+  const getInitials = () => {
+    if (profile?.first_name && profile?.last_name) {
+      return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
+    }
+    return 'U';
+  };
+
   return (
     <header className="border-b p-4 flex justify-between items-center bg-white sticky top-0 z-10">
       <h1 className="text-xl font-semibold text-vtu-primary">
@@ -23,9 +33,12 @@ const DashboardHeader = () => {
             <Button variant="ghost" className="flex items-center gap-2">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/placeholder.svg" alt="User" />
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{getInitials()}</AvatarFallback>
               </Avatar>
-              <span className="hidden sm:inline">Admin User</span>
+              <span className="hidden sm:inline">
+                {profile ? `${profile.first_name} ${profile.last_name}` : 'User'}
+                {isAdmin && <span className="ml-1 text-xs text-vtu-primary">(Admin)</span>}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
@@ -37,7 +50,8 @@ const DashboardHeader = () => {
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer text-red-500">
+            <DropdownMenuItem className="cursor-pointer text-red-500" onClick={() => signOut()}>
+              <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>

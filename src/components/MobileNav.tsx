@@ -1,29 +1,36 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, MessageSquare, BarChart3, Settings, Users, ShoppingCart, Menu, X } from 'lucide-react';
+import { Home, MessageSquare, BarChart3, Settings, Users, ShoppingCart, Menu, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface SidebarLink {
   name: string;
   icon: React.ElementType;
   path: string;
+  adminOnly?: boolean;
 }
-
-const links: SidebarLink[] = [
-  { name: 'Dashboard', icon: Home, path: '/' },
-  { name: 'WhatsApp Chat', icon: MessageSquare, path: '/chat' },
-  { name: 'Products', icon: ShoppingCart, path: '/products' },
-  { name: 'Analytics', icon: BarChart3, path: '/analytics' },
-  { name: 'Customers', icon: Users, path: '/customers' },
-  { name: 'Settings', icon: Settings, path: '/settings' },
-];
 
 const MobileNav = () => {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const { isAdmin } = useAuth();
+  
+  const links: SidebarLink[] = [
+    { name: 'Dashboard', icon: Home, path: '/' },
+    { name: 'WhatsApp Chat', icon: MessageSquare, path: '/chat' },
+    { name: 'Products', icon: ShoppingCart, path: '/products' },
+    { name: 'Analytics', icon: BarChart3, path: '/analytics' },
+    { name: 'Customers', icon: Users, path: '/customers', adminOnly: true },
+    { name: 'Admin', icon: ShieldCheck, path: '/admin', adminOnly: true },
+    { name: 'Settings', icon: Settings, path: '/settings' },
+  ];
+  
+  // Filter links based on user role
+  const filteredLinks = links.filter(link => !link.adminOnly || (link.adminOnly && isAdmin));
   
   return (
     <div className="md:hidden">
@@ -42,7 +49,7 @@ const MobileNav = () => {
             </div>
             
             <div className="space-y-1 px-3 flex-1">
-              {links.map((link) => {
+              {filteredLinks.map((link) => {
                 const Icon = link.icon;
                 const isActive = location.pathname === link.path;
                 
