@@ -87,7 +87,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      // Fixed the signUp method by adding the data structure correctly
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -99,6 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (error) {
+        console.error("Sign up error:", error);
         toast({
           title: "Sign up failed",
           description: error.message,
@@ -107,12 +109,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
+      // Log the response to help with debugging
+      console.log("Sign up response:", data);
+
       toast({
         title: "Account created",
         description: "Please check your email to verify your account.",
       });
       navigate("/login");
     } catch (error: any) {
+      console.error("Sign up exception:", error);
       toast({
         title: "Sign up failed",
         description: error.message,

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState } from 'react';
 
 const signupSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -25,6 +27,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 
 const SignupPage = () => {
   const { signUp } = useAuth();
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -38,7 +41,13 @@ const SignupPage = () => {
   });
 
   const onSubmit = async (data: SignupFormValues) => {
-    await signUp(data.email, data.password, data.firstName, data.lastName);
+    try {
+      setError(null);
+      await signUp(data.email, data.password, data.firstName, data.lastName);
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.message || "An error occurred during sign up");
+    }
   };
 
   return (
@@ -54,6 +63,12 @@ const SignupPage = () => {
         </CardHeader>
         
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
