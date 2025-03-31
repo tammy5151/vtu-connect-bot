@@ -104,7 +104,7 @@ export const useAuthApi = () => {
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (): Promise<void> => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -120,6 +120,7 @@ export const useAuthApi = () => {
           description: error.message,
           variant: "destructive"
         });
+        throw error;
       }
     } catch (error: any) {
       console.error("Google sign in exception:", error);
@@ -128,6 +129,7 @@ export const useAuthApi = () => {
         description: error.message,
         variant: "destructive"
       });
+      throw error;
     }
   };
 

@@ -65,8 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     navigate("/");
   };
 
-  const signInWithGoogle = () => {
-    authApi.signInWithGoogle();
+  const signInWithGoogle = async () => {
+    return authApi.signInWithGoogle();
   };
 
   const signOut = async () => {
