@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { Google } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 const signupSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -179,7 +179,7 @@ const SignupPage = () => {
               className="w-full mt-4 flex items-center gap-2"
               onClick={() => signInWithGoogle()}
             >
-              <Google size={18} />
+              <Mail size={18} />
               Sign up with Google
             </Button>
           </div>
