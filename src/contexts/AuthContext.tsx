@@ -22,6 +22,7 @@ type AuthContextType = {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log("Auth state changed:", event, currentSession?.user?.id);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -87,7 +89,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
     try {
-      // Fixed the signUp method by adding the data structure correctly
+      console.log("Starting sign up process");
+
+      // Create the user in Supabase Auth
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -106,11 +110,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive"
         });
-        return;
+        throw error;
       }
 
-      // Log the response to help with debugging
-      console.log("Sign up response:", data);
+      console.log("Sign up successful:", data);
 
       toast({
         title: "Account created",
@@ -124,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: error.message,
         variant: "destructive"
       });
+      throw error;
     }
   };
 
@@ -140,7 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: error.message,
           variant: "destructive"
         });
-        return;
+        throw error;
       }
 
       toast({
@@ -151,6 +155,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       toast({
         title: "Login failed",
+        description: error.message,
+        variant: "destructive"
+      });
+      throw error;
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/login`
+        }
+      });
+
+      if (error) {
+        console.error("Google sign in error:", error);
+        toast({
+          title: "Google login failed",
+          description: error.message,
+          variant: "destructive"
+        });
+      }
+    } catch (error: any) {
+      console.error("Google sign in exception:", error);
+      toast({
+        title: "Google login failed",
         description: error.message,
         variant: "destructive"
       });
@@ -215,7 +247,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signUp,
         signIn,
         signOut,
-        resetPassword
+        resetPassword,
+        signInWithGoogle
       }}
     >
       {children}

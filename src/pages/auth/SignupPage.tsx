@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useState } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { Google } from 'lucide-react';
 
 const signupSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -26,7 +27,7 @@ const signupSchema = z.object({
 type SignupFormValues = z.infer<typeof signupSchema>;
 
 const SignupPage = () => {
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [error, setError] = useState<string | null>(null);
   
   const form = useForm<SignupFormValues>({
@@ -160,6 +161,28 @@ const SignupPage = () => {
               </Button>
             </form>
           </Form>
+          
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <Separator className="w-full" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+            
+            <Button
+              variant="outline"
+              className="w-full mt-4 flex items-center gap-2"
+              onClick={() => signInWithGoogle()}
+            >
+              <Google size={18} />
+              Sign up with Google
+            </Button>
+          </div>
         </CardContent>
         
         <CardFooter className="flex justify-center">
